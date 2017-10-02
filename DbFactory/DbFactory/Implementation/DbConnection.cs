@@ -1,13 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Data.OleDb;
-using System.Data.Sql;
-using System.Collections;
 using System.Data.SqlClient;
 using System.Data;
 using System.Configuration;
-using System.Data.Common;
 
 namespace DbFactory.Implementation
 {
@@ -16,7 +10,7 @@ namespace DbFactory.Implementation
     /// </summary>
     public class DbConnection : IDbConnection, IDisposable
     {
-        private string connectionString;
+        private string connectionString = String.Empty;
 
         private IDbCommand cmd = new SqlCommand();
 
@@ -37,15 +31,14 @@ namespace DbFactory.Implementation
             {
                 string name = String.Empty;
                 string provider = String.Empty;
-                string connectionString = String.Empty;
 
                 ConnectionStringSettingsCollection connections = ConfigurationManager.ConnectionStrings;
 
-                foreach (ConnectionStringSettings connection in connections)
+                foreach (ConnectionStringSettings conn in connections)
                 {
-                    name = connection.Name;
-                    provider = connection.ProviderName;
-                    connectionString = connection.ConnectionString;
+                    name = conn.Name;
+                    provider = conn.ProviderName;
+                    connectionString = conn.ConnectionString;
 
                     if (!String.IsNullOrEmpty(connectionString) && !String.IsNullOrEmpty(name) && name.ToLower().Equals(connectionStringName.ToLower()))
                     {
@@ -181,40 +174,39 @@ namespace DbFactory.Implementation
             {
                 this.Open();
 
-                object retorno;
-
-                if (ReturnType == (int)ReturnTypeEnum.DataTable)
+                object retorno = null;
+                SqlDataAdapter adapter;
+                switch (ReturnType)
                 {
-                    DataTable table = new DataTable();
-                    SqlDataAdapter adapter = new SqlDataAdapter();
+                    case (int)ReturnTypeEnum.DataTable:
+                        DataTable table = new DataTable();
+                        adapter = new SqlDataAdapter()
+                        {
+                            SelectCommand = (SqlCommand)cmd
+                        };
+                        adapter.Fill(table);
 
-                    adapter.SelectCommand = (SqlCommand)cmd;
-                    adapter.Fill(table);
-
-                    retorno = table;
+                        retorno = table;
+                        break;
+                    case (int)ReturnTypeEnum.DataSet:
+                        DataSet set = new DataSet();
+                        adapter = new SqlDataAdapter()
+                        {
+                            SelectCommand = (SqlCommand)cmd
+                        };
+                        adapter.Fill(set);
+                        retorno = set;
+                        break;
+                    case (int)ReturnTypeEnum.Scalar:
+                        retorno = Convert.ToInt32(cmd.ExecuteScalar());
+                        break;
+                    case (int)ReturnTypeEnum.Reader:
+                        retorno = cmd.ExecuteReader();
+                        break;
+                    default:
+                        retorno = cmd.ExecuteNonQuery();
+                        break;
                 }
-                else if (ReturnType == (int)ReturnTypeEnum.DataSet)
-                {
-                    DataSet set = new DataSet();
-                    SqlDataAdapter adapter = new SqlDataAdapter();
-
-                    adapter.SelectCommand = (SqlCommand)cmd;
-                    adapter.Fill(set);
-                    retorno = set;
-                }
-                else if (ReturnType == (int)ReturnTypeEnum.Scalar)
-                {
-                    retorno = Convert.ToInt32(cmd.ExecuteScalar());
-                }
-                else if (ReturnType == (int)ReturnTypeEnum.Reader)
-                {
-                    retorno = cmd.ExecuteReader();
-                }
-                else
-                {
-                    retorno = cmd.ExecuteNonQuery();
-                }
-
                 return retorno;
             }
             catch 
