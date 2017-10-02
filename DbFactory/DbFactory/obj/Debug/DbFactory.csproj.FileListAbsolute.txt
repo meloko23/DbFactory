@@ -1,0 +1,5 @@
+C:\Users\fernando.faria\Documents\Projetos\DataBaseFactory\DotNet\DbFactory\DbFactory\bin\Debug\DbFactory.dll
+C:\Users\fernando.faria\Documents\Projetos\DataBaseFactory\DotNet\DbFactory\DbFactory\bin\Debug\DbFactory.pdb
+C:\Users\fernando.faria\Documents\Projetos\DataBaseFactory\DotNet\DbFactory\DbFactory\obj\Debug\DbFactory.dll
+C:\Users\fernando.faria\Documents\Projetos\DataBaseFactory\DotNet\DbFactory\DbFactory\obj\Debug\DbFactory.pdb
+C:\Users\fernando.faria\Documents\Projetos\DataBaseFactory\DotNet\DbFactory\DbFactory\obj\Debug\DbFactory.csprojResolveAssemblyReference.cache
